@@ -77,14 +77,14 @@ jobs:
             cd /opt/echoswift
 
             # Pull latest image
-            docker compose pull
+            sudo docker compose pull
 
             # Recreate container
-            docker compose up -d --force-recreate
+            sudo docker compose up -d --force-recreate
 
             # Cleanup old images
-            docker image prune -f
+            sudo docker image prune -f
 
             # Show status
-            docker ps | grep echoswift
-            docker logs --tail 20 echoswift
+            sudo docker ps | grep echoswift
+            sudo docker logs --tail 20 echoswift
