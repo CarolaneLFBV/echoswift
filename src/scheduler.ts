@@ -14,7 +14,7 @@ import { postArticles } from './discord/poster.js';
 /**
  * Check feed and post new articles
  */
-async function checkFeedAndPost(client: Client, config: Config): Promise<void> {
+async function checkFeedAndPost(client: Client, config: Config, maxArticles?: number): Promise<void> {
   console.log(`[${new Date().toISOString()}] 🔄 Starting feed check...`);
 
   try {
@@ -33,7 +33,7 @@ async function checkFeedAndPost(client: Client, config: Config): Promise<void> {
     const postedIds = await loadPostedArticles();
 
     // Filter new articles (not yet posted)
-    const newArticles = articles.filter(article => !postedIds.has(article.id));
+    let newArticles = articles.filter(article => !postedIds.has(article.id));
 
     if (newArticles.length === 0) {
       console.log(`[${new Date().toISOString()}] No new articles to post`);
@@ -46,6 +46,12 @@ async function checkFeedAndPost(client: Client, config: Config): Promise<void> {
 
     // Sort by date (oldest first)
     newArticles.sort((a, b) => a.publishedAt.getTime() - b.publishedAt.getTime());
+
+    // Limit number of articles if specified (for initial sync)
+    if (maxArticles && newArticles.length > maxArticles) {
+      console.log(`[${new Date().toISOString()}] Limiting to ${maxArticles} most recent articles`);
+      newArticles = newArticles.slice(-maxArticles); // Take last N articles (most recent)
+    }
 
     // Post articles
     await postArticles(
@@ -68,6 +74,14 @@ async function checkFeedAndPost(client: Client, config: Config): Promise<void> {
     console.error(`[${new Date().toISOString()}] ❌ Error during feed check:`, error);
     // Don't throw - let scheduler continue running
   }
+}
+
+/**
+ * Initial sync - post the 2 most recent articles on first run
+ */
+async function initialSync(client: Client, config: Config): Promise<void> {
+  console.log(`[${new Date().toISOString()}] 🎬 Running initial sync - posting 2 most recent articles...`);
+  await checkFeedAndPost(client, config, 2);
 }
 
 /**
@@ -97,11 +111,18 @@ export function startScheduler(client: Client, config: Config): void {
     `[${new Date().toISOString()}] ✅ Scheduler started - will check feed at noon and midnight (${config.timezone})`
   );
 
-  // Run once immediately on startup (optional - useful for testing)
+  // Initial sync on startup
   if (config.env === 'development') {
-    console.log(`[${new Date().toISOString()}] Development mode - running initial feed check...`);
+    // Development: post all new articles immediately
+    console.log(`[${new Date().toISOString()}] Development mode - running full feed check...`);
     checkFeedAndPost(client, config).catch(error => {
       console.error(`[${new Date().toISOString()}] Initial feed check failed:`, error);
+    });
+  } else {
+    // Production: post only the 2 most recent articles on first deployment
+    console.log(`[${new Date().toISOString()}] Production mode - running initial sync (2 articles)...`);
+    initialSync(client, config).catch(error => {
+      console.error(`[${new Date().toISOString()}] Initial sync failed:`, error);
     });
   }
 }
