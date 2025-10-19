@@ -1,6 +1,6 @@
-# Swift Feed Bot 🤖
+# EchoSwift 🦅
 
-Discord bot qui récupère et poste automatiquement les articles de [swift.org](https://www.swift.org/atom.xml) sous forme d'embeds Discord.
+Discord bot qui récupère et poste automatiquement les articles de [swift.org](https://www.swift.org/atom.xml) sous forme d'embeds Discord élégants.
 
 ## ✨ Caractéristiques
 
@@ -335,7 +335,7 @@ MIT License - voir [LICENSE](LICENSE) pour plus de détails.
 
 **Carolan Lefebvre**
 
-- GitHub: [@votre-username](https://github.com/votre-username)
+- GitHub: [@CarolaneLFBV](https://github.com/CarolaneLFBV)
 
 ## 🙏 Remerciements
 
