@@ -79,6 +79,9 @@ jobs:
             # Ensure docker-compose.yml uses lowercase image name
             sudo sed -i 's|ghcr.io/CarolaneLFBV/|ghcr.io/carolanelfbv/|g' docker-compose.yml
 
+            # Create traefik network if it doesn't exist
+            sudo docker network create traefik-network 2>/dev/null || true
+
             # Pull latest image
             sudo docker compose pull
 
@@ -89,5 +92,5 @@ jobs:
             sudo docker image prune -f
 
             # Show status
-            sudo docker ps | grep echoswift
-            sudo docker logs --tail 20 echoswift
+            sudo docker ps | grep echoswift || echo "Container starting..."
+            sudo docker logs --tail 20 echoswift 2>/dev/null || echo "Waiting for container to start..."
