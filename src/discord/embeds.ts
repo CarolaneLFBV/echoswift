@@ -16,6 +16,11 @@ export function createArticleEmbed(article: Article): EmbedBuilder {
     ? article.title.substring(0, 253) + '...'
     : article.title;
 
+  // Ensure description doesn't exceed Discord's 4096 char limit
+  const description = article.description.length > 4096
+    ? article.description.substring(0, 4093) + '...'
+    : article.description;
+
   // Format date for footer
   const dateStr = article.publishedAt.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -26,7 +31,7 @@ export function createArticleEmbed(article: Article): EmbedBuilder {
   const embed = new EmbedBuilder()
     .setTitle(title)
     .setURL(article.link)
-    .setDescription(article.description)
+    .setDescription(description)
     .setColor(SWIFT_ORANGE)
     .setFooter({
       text: `swift.org • Published ${dateStr}`,
