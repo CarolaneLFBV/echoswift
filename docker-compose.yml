@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  echoswift:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: echoswift
+    restart: unless-stopped
+
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - CHANNEL_ID=${CHANNEL_ID}
+      - ROLE_ID=${ROLE_ID}
+      - FEED_URL=https://www.swift.org/atom.xml
+      - TIMEZONE=Europe/Paris
+      - NODE_ENV=production
+
+    volumes:
+      - ./data:/app/data
+
+    networks:
+      - traefik-network
+
+    labels:
+      # Traefik disabled - bot has no HTTP endpoints
+      - "traefik.enable=false"
+
+      # Optional: Watchtower auto-update
+      - "com.centurylinklabs.watchtower.enable=true"
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  traefik-network:
+    external: true

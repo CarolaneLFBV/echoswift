@@ -1,0 +1,24 @@
+{
+  "name": "swift-feed-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that fetches and posts Swift.org articles",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "rss-parser": "^3.13.0",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "@types/node-cron": "^3.0.11",
+    "bun-types": "^1.0.26"
+  },
+  "author": "Carolan Lefebvre",
+  "license": "MIT"
+}
