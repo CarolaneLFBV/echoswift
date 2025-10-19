@@ -23,8 +23,9 @@ export async function postArticle(
       throw new Error(`Channel ${channelId} not found`);
     }
 
-    if (channel.type !== ChannelType.GuildText) {
-      throw new Error(`Channel ${channelId} is not a text channel`);
+    // Support both text and announcement channels
+    if (channel.type !== ChannelType.GuildText && channel.type !== ChannelType.GuildAnnouncement) {
+      throw new Error(`Channel ${channelId} is not a text or announcement channel`);
     }
 
     const textChannel = channel as TextChannel;
