@@ -76,6 +76,9 @@ jobs:
           script: |
             cd /opt/echoswift
 
+            # Ensure docker-compose.yml uses lowercase image name
+            sudo sed -i 's|ghcr.io/CarolaneLFBV/|ghcr.io/carolanelfbv/|g' docker-compose.yml
+
             # Pull latest image
             sudo docker compose pull
 
