@@ -16,9 +16,10 @@ export function createArticleEmbed(article: Article): EmbedBuilder {
     ? article.title.substring(0, 253) + '...'
     : article.title;
 
-  // Ensure description doesn't exceed Discord's 4096 char limit
-  const description = article.description.length > 4096
-    ? article.description.substring(0, 4093) + '...'
+  // Use short excerpt instead of full description (200 chars max)
+  const maxLength = 200;
+  const description = article.description.length > maxLength
+    ? article.description.substring(0, maxLength).trim() + '...'
     : article.description;
 
   // Format date for footer
