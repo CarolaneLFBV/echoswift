@@ -31,17 +31,20 @@ async function checkFeedAndPost(client: Client, config: Config, maxArticles?: nu
 
     // Load posted articles
     const postedIds = await loadPostedArticles();
+    console.log(
+      `[${new Date().toISOString()}] Storage contains ${postedIds.size} previously posted articles`
+    );
 
     // Filter new articles (not yet posted)
     let newArticles = articles.filter(article => !postedIds.has(article.id));
 
     if (newArticles.length === 0) {
-      console.log(`[${new Date().toISOString()}] No new articles to post`);
+      console.log(`[${new Date().toISOString()}] ✓ No new articles to post (all ${articles.length} articles already posted)`);
       return;
     }
 
     console.log(
-      `[${new Date().toISOString()}] Found ${newArticles.length} new articles (${articles.length} total in feed)`
+      `[${new Date().toISOString()}] Found ${newArticles.length} new articles (${articles.length} total in feed, ${postedIds.size} already posted)`
     );
 
     // Sort by date (oldest first)

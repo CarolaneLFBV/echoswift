@@ -58,28 +58,51 @@ export async function loadPostedArticles(): Promise<Set<string>> {
 
 /**
  * Save posted articles to JSON file with backup
+ * Preserves original postedAt timestamps for existing articles
  */
 export async function savePostedArticles(articleIds: Set<string>): Promise<void> {
   try {
     await ensureDataDirectory();
 
-    // Create backup of existing file
+    // Load existing articles to preserve their original postedAt timestamps
+    const existingArticles = new Map<string, string>();
     if (existsSync(STORAGE_PATH)) {
       const content = await readFile(STORAGE_PATH, 'utf-8');
       await writeFile(BACKUP_PATH, content, 'utf-8');
+
+      const existing: PostedArticle[] = JSON.parse(content);
+      existing.forEach(article => {
+        existingArticles.set(article.id, article.postedAt);
+      });
     }
 
-    const articles: PostedArticle[] = Array.from(articleIds).map(id => ({
-      id,
-      postedAt: new Date().toISOString(),
-    }));
+    const now = new Date().toISOString();
+    let newCount = 0;
+    let preservedCount = 0;
+
+    const articles: PostedArticle[] = Array.from(articleIds).map(id => {
+      const existingDate = existingArticles.get(id);
+      if (existingDate) {
+        preservedCount++;
+      } else {
+        newCount++;
+      }
+
+      return {
+        id,
+        // Preserve original postedAt if article exists, otherwise use current time
+        postedAt: existingDate || now,
+      };
+    });
 
     // Atomic write: write to temp file, then rename
     const tempPath = `${STORAGE_PATH}.tmp`;
     await writeFile(tempPath, JSON.stringify(articles, null, 2), 'utf-8');
     await Bun.write(STORAGE_PATH, await Bun.file(tempPath).text());
 
-    console.log(`[${new Date().toISOString()}] Saved ${articles.length} articles to storage`);
+    console.log(
+      `[${new Date().toISOString()}] Saved ${articles.length} articles to storage (${newCount} new, ${preservedCount} preserved)`
+    );
 
   } catch (error) {
     console.error(`[${new Date().toISOString()}] Error saving storage:`, error);
