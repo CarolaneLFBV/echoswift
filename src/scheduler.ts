@@ -80,14 +80,6 @@ async function checkFeedAndPost(client: Client, config: Config, maxArticles?: nu
 }
 
 /**
- * Initial sync - post the 2 most recent articles on first run
- */
-async function initialSync(client: Client, config: Config): Promise<void> {
-  console.log(`[${new Date().toISOString()}] 🎬 Running initial sync - posting 2 most recent articles...`);
-  await checkFeedAndPost(client, config, 2);
-}
-
-/**
  * Start cron scheduler
  * Runs at 12:00 and 00:00 in configured timezone
  */
@@ -122,10 +114,7 @@ export function startScheduler(client: Client, config: Config): void {
       console.error(`[${new Date().toISOString()}] Initial feed check failed:`, error);
     });
   } else {
-    // Production: post only the 2 most recent articles on first deployment
-    console.log(`[${new Date().toISOString()}] Production mode - running initial sync (2 articles)...`);
-    initialSync(client, config).catch(error => {
-      console.error(`[${new Date().toISOString()}] Initial sync failed:`, error);
-    });
+    // Production: NO initial sync - only post new articles at scheduled times
+    console.log(`[${new Date().toISOString()}] Production mode - initial sync disabled. Will only post new articles at scheduled times (12:00, 00:00).`);
   }
 }
